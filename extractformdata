@@ -1,0 +1,9 @@
+#!/bin/sh
+
+cat_with_header()
+{
+	echo "Content-Type: $CONTENT_TYPE"
+	cat
+}
+
+cat_with_header | ripmime -i - --formdata -q "$@" > /dev/null

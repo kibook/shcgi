@@ -1,0 +1,10 @@
+#!/bin/sh
+
+tr '=&' '\t\n' | while read key val
+do
+	if test "$1" = "$key"
+	then
+		urlencode -d "$val"
+		break
+	fi
+done
