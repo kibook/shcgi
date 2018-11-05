@@ -25,7 +25,7 @@ request.
 `param name`
 Read URL-encoded POST parameters.
 
-`sendheaders [-n] <header>`
+`header [-n] <header>`
 Build the HTTP headers for the response.
 
 `urlparam name`

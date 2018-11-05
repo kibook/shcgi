@@ -1,5 +1,5 @@
 PREFIX=/usr/local
-TOOLS=cookie extractformdata param sendheaders urlparam
+TOOLS=cookie extractformdata param header urlparam
 
 all:
 

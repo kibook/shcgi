@@ -2,7 +2,7 @@
 
 if test "$2"
 then
-	sendheaders -n "Set-Cookie: $1=$2"
+	header -n "Set-Cookie: $1=$2"
 else
 	echo "$HTTP_COOKIE" | tr '=;' '\t\n' | while read key val
 	do
