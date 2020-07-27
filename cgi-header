@@ -1,0 +1,43 @@
+#!/bin/sh
+
+show_help() {
+	echo "Usage: cgi-header [-n] <content>"
+	echo
+	echo "Options:"
+	echo "  -n         Continue adding headers."
+	echo "  <content>  The content of the header."
+}
+
+end=true
+
+while getopts hn opt
+do
+	case $opt in
+		h|'?')
+			show_help
+			exit
+			;;
+		n)
+			end=false
+			;;
+	esac
+done
+shift $((OPTIND - 1))
+
+if test "$#" -lt 1
+then
+	echo "Not enough arguments" >&2
+	show_help
+	exit 1
+fi
+
+while test "$1"
+do
+	printf '%s\r\n' "$1"
+	shift
+done
+
+if $end
+then
+	printf '\r\n'
+fi

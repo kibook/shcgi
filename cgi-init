@@ -1,0 +1,78 @@
+#!/bin/sh
+
+show_help() {
+	echo "Usage: cgi-init [-m] [<dir>]"
+	echo
+	echo "Options:"
+	echo "  -m     Read multipart/form-data POST request"
+	echo "  <dir>  CGI data directory to initialize"
+	echo
+	echo "Example:"
+	echo "  cgi=\$(cgi-init)"
+}
+
+while getopts h opt
+do
+	case $opt in
+		h|'?')
+			show_help
+			exit
+			;;
+	esac
+done
+shift $((OPTIND - 1))
+
+# Create CGI directory
+if test "$#" -gt 0
+then
+	dir=$1
+	mkdir -p "$dir"
+else
+	dir=$(mktemp -d)
+fi
+
+# Read GET/POST parameters
+mkdir -p "$dir/params"
+
+cat_with_header() {
+	echo "Content-type: $CONTENT_TYPE"
+	cat
+}
+
+read_params() {
+	tr '=&' '\t\n' | while read key val
+	do
+		if test -n "$key" -a -n "$val"
+		then
+			urlencode -d "$val" > "$dir/params/$key"
+		fi
+	done
+}
+
+# Extract MIME-encoded POST request
+if echo "$CONTENT_TYPE" | grep -q 'multipart/form-data'
+then
+	cat_with_header | ripmime -i - --formdata -q -d "$dir/params" >/dev/null
+# Read params from url-encoded POST request
+elif test "$REQUEST_METHOD" = POST
+then
+	read_params
+# Read params from url-encoded query string
+elif test "$REQUEST_METHOD" = GET
+then
+	echo "$QUERY_STRING" | read_params
+fi
+
+# Read cookies
+mkdir -p "$dir/cookies"
+
+echo "$HTTP_COOKIE" | tr '=;' '\t\n' | while read key val
+do
+	if test -n "$key" -a -n "$val"
+	then
+		echo "$val" > "$dir/cookies/$key"
+	fi
+done
+
+# Return CGI directory
+echo "$dir"

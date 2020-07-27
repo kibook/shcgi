@@ -1,0 +1,36 @@
+#!/bin/sh
+
+show_help() {
+	echo "Usage:"
+	echo "  cgi-set-cookie <name> <value>"
+	echo
+	echo "Options:"
+	echo "  <name>   Name of cookie."
+	echo "  <value>  Value of cookie."
+	echo
+	echo "Example:"
+	echo "  cgi-set-cookie sessionId 12345"
+}
+
+while getopts ahs opt
+do
+	case $opt in
+		h|'?')
+			show_help
+			exit
+			;;
+	esac
+done
+shift $((OPTIND - 1))
+
+if test "$#" -lt 2
+then
+	echo "Not enough arguments" >&2
+	show_help
+	exit 1
+fi
+
+name=$1
+value=$2
+
+cgi-header -n "Set-Cookie: $name=$value"

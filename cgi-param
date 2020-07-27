@@ -1,0 +1,35 @@
+#!/bin/sh
+
+show_help() {
+	echo "Usage: cgi-param <dir> <name>"
+	echo
+	echo "Options:"
+	echo "  <dir>   CGI data directory."
+	echo "  <name>  Name of param."
+	echo
+	echo "Example:"
+	echo "  cgi-param \"\$cgi\" name"
+}
+
+while getopts ah opt
+do
+	case $opt in
+		h|'?')
+			show_help
+			exit
+			;;
+	esac
+done
+shift $((OPTIND - 1))
+
+if test "$#" -lt 2
+then
+	echo "Not enough arguments" >&2
+	show_help
+	exit 1
+fi
+
+dir=$1
+name=$(urlencode "$2")
+
+cat "$dir/params/$name" 2>/dev/null

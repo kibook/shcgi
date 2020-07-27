@@ -15,18 +15,42 @@ The `PREFIX` make variable controls where the tools are installed.
 Default value is `/usr/local`.
 
 # tools
-`cookie name [value]`
-Get a cookie from a request or set a cookie in a response.
+`cgi-cookie <dir> <name>`
+Get a cookie from the request.
 
-`extractformdata [ripmime options]`
-Extract files and values from a multipart/form-data encoded POST
-request.
+`cgi-free <dir>`
+Clean up the CGI files directory.
 
-`param name`
-Read URL-encoded POST parameters.
-
-`header [-n] <header>`
+`cgi-header [-n] <header>`
 Build the HTTP headers for the response.
 
-`urlparam name`
-Read URL-encoded GET parameters.
+`cgi-init`
+Initiate the CGI files directory. Should be cleaned up at the end of the script with `cgi-free`.
+
+`cgi-param <dir> <name>`
+Read URL-encoded POST parameters.
+
+`cgi-set-cookie <name> <value>`
+Set a cookie in the response.
+
+# example
+```sh
+#!/bin/sh
+
+cgi=$(cgi-init)
+
+cgi-header 'Content-type: text/html'
+
+cat <<EOF
+<html>
+<head>
+<title>CGI example</title>
+</head>
+<body>
+<div>Value of parameter foo: $(cgi-param "$cgi" foo)</div>
+</body>
+</html>
+EOF
+
+cgi-free "$cgi"
+```
