@@ -1,9 +1,10 @@
 #!/bin/sh
 
 show_help() {
-	echo "Usage: cgi-param <dir> <name>"
+	echo "Usage: cgi-param [-a] <dir> [<name>]"
 	echo
 	echo "Options:"
+	echo "  -a      List all parameters."
 	echo "  <dir>   CGI data directory."
 	echo "  <name>  Name of param."
 	echo
@@ -11,9 +12,14 @@ show_help() {
 	echo "  cgi-param \"\$cgi\" name"
 }
 
+listall=false
+
 while getopts ah opt
 do
 	case $opt in
+		a)
+			listall=true
+			;;
 		h|'?')
 			show_help
 			exit
@@ -22,7 +28,7 @@ do
 done
 shift $((OPTIND - 1))
 
-if test "$#" -lt 2
+if test "$#" -lt 1
 then
 	echo "Not enough arguments" >&2
 	show_help
@@ -30,6 +36,15 @@ then
 fi
 
 dir=$1
-name=$(urlencode "$2")
 
-cat "$dir/params/$name" 2>/dev/null
+if $listall
+then
+	find "$dir/params" -type f -printf '%f\n' 2>/dev/null | while read name
+	do
+		urlencode -d "$name"
+	done
+else
+	name=$(urlencode "$2")
+
+	cat "$dir/params/$name" 2>/dev/null
+fi
