@@ -28,7 +28,7 @@ Build the HTTP headers for the response.
 Initiate the CGI files directory. Should be cleaned up at the end of the script with `cgi-free`.
 
 `cgi-param [-a] <dir> [<name>]`
-Read URL-encoded POST parameters.
+Read parameters from the request.
 
 `cgi-set-cookie <name> <value>`
 Set a cookie in the response.
