@@ -42,7 +42,7 @@ if $listall
 then
 	find "$dir/cookies" -type f -printf '%f\n' 2>/dev/null | while read name
 	do
-		urlencode -d "$name"
+		echo "$name"
 	done
 else
 	name=$2

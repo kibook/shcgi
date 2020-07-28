@@ -41,10 +41,10 @@ if $listall
 then
 	find "$dir/params" -type f -printf '%f\n' 2>/dev/null | while read name
 	do
-		urlencode -d "$name"
+		echo "$name"
 	done
 else
-	name=$(urlencode "$2")
+	name=$2
 
 	cat "$dir/params/$name" 2>/dev/null
 fi

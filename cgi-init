@@ -42,6 +42,8 @@ cat_with_header() {
 read_params() {
 	tr '=&' '\t\n' | while read key val
 	do
+		key=$(urlencode -d "$key")
+
 		if test -n "$key" -a -n "$val"
 		then
 			urlencode -d "$val" > "$dir/params/$key"
@@ -68,6 +70,8 @@ mkdir -p "$dir/cookies"
 
 echo "$HTTP_COOKIE" | tr '=;' '\t\n' | while read key val
 do
+	key=$(urlencode -d "$key")
+
 	if test -n "$key" -a -n "$val"
 	then
 		echo "$val" > "$dir/cookies/$key"
