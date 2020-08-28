@@ -40,7 +40,7 @@ cat_with_header() {
 }
 
 read_params() {
-	tr '=&' '\t\n' | while read key val
+	{ cat; echo; } | tr '=&' '\t\n' | while read key val
 	do
 		key=$(urlencode -d "$key")
 
@@ -62,7 +62,7 @@ then
 # Read params from url-encoded query string
 elif test "$REQUEST_METHOD" = GET
 then
-	echo "$QUERY_STRING" | read_params
+	printf %s "$QUERY_STRING" | read_params
 fi
 
 # Read cookies
