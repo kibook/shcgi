@@ -1,14 +1,18 @@
 #!/bin/sh
 
 show_help() {
-	echo "Usage: cgi-init [-m] [<dir>]"
+	echo "Usage: cgi-init [<dir>]"
 	echo
 	echo "Options:"
-	echo "  -m     Read multipart/form-data POST request"
-	echo "  <dir>  CGI data directory to initialize"
+	echo "  <dir>  Store CGI data in <dir>."
 	echo
 	echo "Example:"
 	echo "  cgi=\$(cgi-init)"
+	echo
+	echo "Directory structure:"
+	echo "  \${cgi}/message-body  Raw request message body"
+	echo "  \${cgi}/params        GET/POST parameters"
+	echo "  \${cgi}/cookies       HTTP cookies"
 }
 
 while getopts h opt
@@ -31,11 +35,14 @@ else
 	dir=$(mktemp -d)
 fi
 
+# Store request message body
+cat > "${dir}/message-body"
+
 # Read GET/POST parameters
-mkdir -p "$dir/params"
+mkdir -p "${dir}/params"
 
 cat_with_header() {
-	echo "Content-type: $CONTENT_TYPE"
+	echo "Content-type: ${CONTENT_TYPE}"
 	cat
 }
 
@@ -46,7 +53,7 @@ read_params() {
 
 		if test -n "$key" -a -n "$val"
 		then
-			urlencode -d "$val" > "$dir/params/$key"
+			urlencode -d "$val" > "${dir}/params/${key}"
 		fi
 	done
 }
@@ -54,19 +61,18 @@ read_params() {
 # Extract MIME-encoded POST request
 if echo "$CONTENT_TYPE" | grep -q 'multipart/form-data'
 then
-	cat_with_header | ripmime -i - --formdata -q -d "$dir/params" >/dev/null
+	cat_with_header < "${dir}/message-body" | ripmime -i - --formdata -q -d "${dir}/params" >/dev/null
 # Read params from url-encoded POST request
-elif test "$REQUEST_METHOD" = POST
+elif echo "$CONTENT_TYPE" | grep -q 'application/x-www-form-urlencoded'
 then
-	read_params
-# Read params from url-encoded query string
-elif test "$REQUEST_METHOD" = GET
-then
-	printf %s "$QUERY_STRING" | read_params
+	read_params < "${dir}/message-body"
 fi
 
+# Read params from url-encoded query string
+printf %s "$QUERY_STRING" | read_params
+
 # Read cookies
-mkdir -p "$dir/cookies"
+mkdir -p "${dir}/cookies"
 
 echo "$HTTP_COOKIE" | tr '=;' '\t\n' | while read key val
 do
@@ -74,7 +80,7 @@ do
 
 	if test -n "$key" -a -n "$val"
 	then
-		echo "$val" > "$dir/cookies/$key"
+		urlencode -d "$val" > "${dir}/cookies/${key}"
 	fi
 done
 
