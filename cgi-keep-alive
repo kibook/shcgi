@@ -1,0 +1,45 @@
+#!/bin/sh
+
+CGI_WAIT_INTERVAL=${CGI_WAIT_INTERVAL:-30}
+CGI_WAIT_TICK=${CGI_WAIT_TICK:-1}
+
+running() {
+	ps -p $1 >/dev/null 2>&1
+}
+
+show_help() {
+	echo "Usage: cgi-wait [-h] <pid> <message>"
+	echo
+	echo "Options:"
+	echo "  -h  Show usage message."
+	echo "  <pid>          PID to wait on."
+	echo "  <message>      Message to send."
+}
+
+while getopts hi:t: opt
+do
+	case $opt in
+		h|\?)
+			show_help
+			exit
+			;;
+	esac
+done
+shift $((OPTIND - 1))
+
+pid=$1
+message=${2:-'<!-- -->'}
+
+i=0
+
+while running "$pid"
+do
+	if test $((i % CGI_WAIT_INTERVAL)) = 0
+	then
+		echo "$message"
+	fi
+
+	sleep "$CGI_WAIT_TICK"
+
+	i=$((i + 1))
+done
