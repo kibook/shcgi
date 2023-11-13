@@ -76,8 +76,6 @@ mkdir -p "${dir}/cookies"
 
 echo "$HTTP_COOKIE" | tr '=;' '\t\n' | while read key val
 do
-	key=$(urlencode -d "$key")
-
 	if test -n "$key" -a -n "$val"
 	then
 		urlencode -d "$val" > "${dir}/cookies/${key}"

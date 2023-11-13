@@ -42,10 +42,10 @@ if $listall
 then
 	find "$dir/cookies" -type f -printf '%f\n' 2>/dev/null | while read name
 	do
-		echo "$name"
+		echo "$(urlencode -d "$name")"
 	done
 else
-	name=$2
+	name=$(urlencode "$2")
 
 	cat "$dir/cookies/$name" 2>/dev/null
 fi
