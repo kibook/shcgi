@@ -8,17 +8,23 @@ running() {
 }
 
 show_help() {
-	echo "Usage: cgi-wait [-h] <pid> <message>"
+	echo "Usage: cgi-keep-alive [-bh] <pid> <message>"
 	echo
 	echo "Options:"
+	echo "  -b  Send message as-is instead of formatting it as a header."
 	echo "  -h  Show usage message."
 	echo "  <pid>          PID to wait on."
 	echo "  <message>      Message to send."
 }
 
+format_as_header=true
+
 while getopts hi:t: opt
 do
 	case $opt in
+		b)
+			format_as_header=false
+			;;
 		h|\?)
 			show_help
 			exit
@@ -36,7 +42,12 @@ while running "$pid"
 do
 	if test $((i % CGI_WAIT_INTERVAL)) = 0
 	then
-		echo "$message"
+		if $format_as_header
+		then
+			cgi-header -n "CGI-Keep-Alive: $message"
+		else
+			echo "$message"
+		fi
 	fi
 
 	sleep "$CGI_WAIT_TICK"
