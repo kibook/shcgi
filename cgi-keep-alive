@@ -19,7 +19,7 @@ show_help() {
 
 format_as_header=true
 
-while getopts hi:t: opt
+while getopts bhi:t: opt
 do
 	case $opt in
 		b)
