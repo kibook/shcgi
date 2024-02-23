@@ -2,12 +2,14 @@
 
 show_help() {
 	echo "Usage:"
-	echo "  cgi-cookie [-a] <dir> [<name>]"
+	echo "  cgi-cookie (-a | <name>)"
 	echo
 	echo "Options:"
 	echo "  -a       List all cookies."
-	echo "  <dir>    CGI data directory."
 	echo "  <name>   Name of cookie."
+	echo
+	echo "Environment variables:"
+	echo "  SHCGI  The directory returned by cgi-init."
 	echo
 	echo "Example:"
 	echo "  cgi-cookie \"\$cgi\" sessionId"
@@ -36,16 +38,12 @@ then
 	exit 1
 fi
 
-dir=$1
-
 if $listall
 then
-	find "$dir/cookies" -type f -printf '%f\n' 2>/dev/null | while read name
+	find "$SHCGI/cookies" -type f -printf '%f\n' 2>/dev/null | while read name
 	do
 		echo "$(urlencode -d "$name")"
 	done
 else
-	name=$(urlencode "$2")
-
-	cat "$dir/cookies/$name" 2>/dev/null
+	cat "$SHCGI/cookies/$1" 2>/dev/null
 fi

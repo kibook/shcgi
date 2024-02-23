@@ -1,12 +1,14 @@
 #!/bin/sh
 
 show_help() {
-	echo "Usage: cgi-param [-a] <dir> [<name>]"
+	echo "Usage: cgi-param (-a | <name>)"
 	echo
 	echo "Options:"
 	echo "  -a      List all parameters."
-	echo "  <dir>   CGI data directory."
 	echo "  <name>  Name of param."
+	echo
+	echo "Environment variables:"
+	echo "  SHCGI  The directory returned by cgi-init."
 	echo
 	echo "Example:"
 	echo "  cgi-param \"\$cgi\" name"
@@ -28,23 +30,13 @@ do
 done
 shift $((OPTIND - 1))
 
-if test "$#" -lt 1
-then
-	echo "Not enough arguments" >&2
-	show_help
-	exit 1
-fi
-
-dir=$1
-
 if $listall
 then
-	find "$dir/params" -type f -printf '%f\n' 2>/dev/null | while read name
+	find "$SHCGI/params" -type f -printf '%f\n' 2>/dev/null | while read name
 	do
 		echo "$name"
 	done
-else
-	name=$2
-
-	cat "$dir/params/$name" 2>/dev/null
+elif test $# = 1
+then
+	cat "$SHCGI/params/$1" 2>/dev/null
 fi

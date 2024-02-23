@@ -1,13 +1,13 @@
 #!/bin/sh
 
 show_help() {
-	echo "Usage: cgi-free <dir>"
+	echo "Usage: cgi-free"
 	echo
-	echo "Options:"
-	echo "  <dir>  CGI data directory to free."
+	echo "Environment variables:"
+	echo "  SHCGI  CGI data directory to free."
 	echo
 	echo "Example:"
-	echo "  cgi-free \"\$cgi\""
+	echo "  cgi-free"
 }
 
 while getopts h opt
@@ -21,13 +21,4 @@ do
 done
 shift $((OPTIND - 1))
 
-if test "$#" -lt 1
-then
-	echo "Not enough arguments" >&2
-	show_help
-	exit 1
-fi
-
-dir=$1
-
-rm -rf "$dir"
+rm -rf "$SHCGI"

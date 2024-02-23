@@ -15,10 +15,10 @@ The `PREFIX` make variable controls where the tools are installed.
 Default value is `/usr/local`.
 
 # tools
-`cgi-cookie [-a] <dir> [<name>]`
+`cgi-cookie (-a | <name>)`
 Get a cookie from the request.
 
-`cgi-free <dir>`
+`cgi-free`
 Clean up the CGI files directory.
 
 `cgi-header [-n] <header>`
@@ -27,17 +27,22 @@ Build the HTTP headers for the response.
 `cgi-init`
 Initiate the CGI files directory. Should be cleaned up at the end of the script with `cgi-free`.
 
-`cgi-param [-a] <dir> [<name>]`
+`cgi-param (-a | <name>)`
 Read parameters from the request.
 
 `cgi-set-cookie <name> <value>`
 Set a cookie in the response.
 
+# environment variables
+
+`SHCGI`
+The CGI directory created by `cgi-init`.
+
 # example
 ```sh
 #!/bin/sh
 
-cgi=$(cgi-init)
+export SHCGI=$(cgi-init)
 
 cgi-header 'Content-type: text/html'
 
@@ -47,10 +52,10 @@ cat <<EOF
 <title>CGI example</title>
 </head>
 <body>
-<div>Value of parameter foo: $(cgi-param "$cgi" foo)</div>
+<div>Value of parameter foo: $(cgi-param foo)</div>
 </body>
 </html>
 EOF
 
-cgi-free "$cgi"
+cgi-free
 ```
