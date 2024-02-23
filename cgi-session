@@ -1,0 +1,117 @@
+#!/bin/sh
+
+# Lifetime of sessions in minutes
+: ${SHCGI_SESSION_LIFETIME:=30}
+
+# The directory where sessions are stored
+: ${SHCGI_SESSION_DIR:=cgi-sessions}
+
+# The name of the cookie used for the session ID
+: ${SHCGI_SESSION_COOKIE:=session}
+
+# The special action to perform with the tool
+action=
+
+show_help() {
+	echo 'Usage: cgi-session [-h | -s | -x | [<param> [<value>]]'
+	echo
+	echo 'Options:'
+	echo '  -h         Show the usage message.'
+	echo '  -s         Sets the session cookie header for the current response.'
+	echo '  -x         Deletes the current session.'
+	echo '  <param>    The name of a session parameter.'
+	echo '  <value>    The new value to set for the session parameter.'
+	echo
+	echo 'Environment variables:'
+	echo '  SHCGI                   The current CGI request directory created by cgi-init.'
+	echo '  SHCGI_SESSION           The current session.'
+	echo '  SHCGI_SESSION_LIFETIME  The lifetime in minutes of a session. Default is 30.'
+	echo '  SHCGI_SESSION_DIR       The directory used to store sessions. Default is "cgi-sessions" in the current directory.'
+	echo '  SHCGI_SESSION_COOKIE    The name of the cookie used for the session ID. Default is "session".'
+	echo
+	echo 'Example:'
+	echo '  # Initialize CGI request'
+	echo '  export SHCGI=$(cgi-init)'
+	echo
+	echo '  # Initialize session and add to response'
+	echo '  export SHCGI_SESSION=$(cgi-session)'
+	echo '  cgi-session -s'
+	echo
+	echo '  # Set and get a session parameter'
+	echo '  cgi-session foo bar'
+	echo '  foo=$(cgi-session foo)'
+	echo
+	echo '  # Delete the session'
+	echo '  cgi-session -x'
+}
+
+while getopts hsx opt
+do
+	case $opt in
+		h)
+			show_help
+			exit
+			;;
+		s)
+			action=setcookie
+			;;
+		x)
+			action=delete
+			;;
+		?)
+			echo >&2
+			show_help
+			exit 1
+			;;
+	esac
+done
+shift $((OPTIND - 1))
+
+# Create the session dir if it does not exist
+mkdir -p "$SHCGI_SESSION_DIR"
+
+# Prune old sessions
+find "$SHCGI_SESSION_DIR" -mindepth 1 -type d -mmin +"$SHCGI_SESSION_LIFETIME" -exec rm -rf {} +
+
+# Set the session cookie if the -s option is used
+if test "$action" = setcookie
+then
+	cgi-set-cookie "$SHCGI_SESSION_COOKIE" "$(basename "$SHCGI_SESSION")"
+# Delete the session if the -x option is used
+elif test "$action" = delete
+then
+	rm -rf "$SHCGI_SESSION"
+# cgi-session
+elif test $# = 0
+then
+	session_id=$(cgi-cookie "$SHCGI_SESSION_COOKIE")
+
+	echo "DEBUG: session_id = $session_id, $SHCGI" >&2
+	ls -l "$SHCGI/cookies" >&2
+
+	# If the session_id is empty or the corresponding directory does not exist, create it.
+	if test -z "$session_id" -o ! -d "$SHCGI_SESSION_DIR/$session_id"
+	then
+		session_id=$(uuidgen)
+		mkdir -p "$SHCGI_SESSION_DIR/$session_id"
+	# Otherwise, update the modified time of the existing directory.
+	else
+		touch "$SHCGI_SESSION_DIR/$session_id"
+	fi
+
+	echo "$SHCGI_SESSION_DIR/$session_id"
+# cgi-session <param>
+elif test $# = 1
+then
+	cat "$SHCGI_SESSION/$1" 2>/dev/null
+# cgi-session <param> <value>
+elif test $# = 2
+then
+	echo "$2" > "$SHCGI_SESSION/$1"
+# For any other number of arguments, fail.
+else
+	echo 'Invalid number of arguments.' >&2
+	echo >&2
+	show_help
+	exit 1
+fi
