@@ -86,9 +86,6 @@ elif test $# = 0
 then
 	session_id=$(cgi-cookie "$SHCGI_SESSION_COOKIE")
 
-	echo "DEBUG: session_id = $session_id, $SHCGI" >&2
-	ls -l "$SHCGI/cookies" >&2
-
 	# If the session_id is empty or the corresponding directory does not exist, create it.
 	if test -z "$session_id" -o ! -d "$SHCGI_SESSION_DIR/$session_id"
 	then
