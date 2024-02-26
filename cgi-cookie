@@ -35,23 +35,17 @@ do
 done
 shift $((OPTIND - 1))
 
-if test $# -lt 1
-then
-	echo "Not enough arguments" >&2
-	show_help
-	exit 1
-fi
-
 if $listall
 then
 	find "$SHCGI/cookies" -type f -printf '%f\n' 2>/dev/null | while read name
 	do
 		echo "$(urlencode -d "$name")"
 	done
-elif $# -lt 2
+elif test $# = 1
 then
 	cat "$SHCGI/cookies/$1" 2>/dev/null
-else
+elif test $# = 2
+then
 	header="Set-Cookie: $1=$2"
 
 	if test -n "$SHCGI_COOKIE_DOMAIN"
@@ -65,4 +59,8 @@ else
 	fi
 
 	cgi-header -n "$header"
+else
+	echo 'Invalid number of arguments.' >&2
+	show_help
+	exit 1
 fi
