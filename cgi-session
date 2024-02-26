@@ -24,6 +24,8 @@ show_help() {
 	echo
 	echo 'Environment variables:'
 	echo '  SHCGI                   The current CGI request directory created by cgi-init.'
+	echo '  SHCGI_COOKIE_DOMAIN     The domain used for the session cookie.'
+	echo '  SHCGI_COOKIE_PATH       The path used for the session cookie.'
 	echo '  SHCGI_SESSION           The current session.'
 	echo '  SHCGI_SESSION_LIFETIME  The lifetime in minutes of a session. Default is 30.'
 	echo '  SHCGI_SESSION_DIR       The directory used to store sessions. Default is "cgi-sessions" in the current directory.'
