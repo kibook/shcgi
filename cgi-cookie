@@ -2,17 +2,21 @@
 
 show_help() {
 	echo "Usage:"
-	echo "  cgi-cookie (-a | <name>)"
+	echo "  cgi-cookie (-a | <name> [<value>])"
 	echo
 	echo "Options:"
 	echo "  -a       List all cookies."
 	echo "  <name>   Name of cookie."
+	echo "  <value>  Set a value for the named cookie."
 	echo
 	echo "Environment variables:"
-	echo "  SHCGI  The directory returned by cgi-init."
+	echo "  SHCGI                The directory returned by cgi-init."
+	echo "  SHCGI_COOKIE_DOMAIN  The domain used for cookies."
+	echo "  SHCGI_COOKIE_PATH    The path used for cookies."
 	echo
 	echo "Example:"
-	echo "  cgi-cookie \"\$cgi\" sessionId"
+	echo "  cgi-cookie sessionId"
+	echo "  cgi-cookie theme light"
 }
 
 listall=false
@@ -31,7 +35,7 @@ do
 done
 shift $((OPTIND - 1))
 
-if test "$#" -lt 1
+if test $# -lt 1
 then
 	echo "Not enough arguments" >&2
 	show_help
@@ -44,6 +48,21 @@ then
 	do
 		echo "$(urlencode -d "$name")"
 	done
-else
+elif $# -lt 2
+then
 	cat "$SHCGI/cookies/$1" 2>/dev/null
+else
+	header="Set-Cookie: $1=$2"
+
+	if test -n "$SHCGI_COOKIE_DOMAIN"
+	then
+		header+="; Domain=$SHCGI_COOKIE_DOMAIN"
+	fi
+
+	if test -n "$SHCGI_COOKIE_PATH"
+	then
+		header+="; Path=$SHCGI_COOKIE_PATH"
+	fi
+
+	cgi-header -n "$header"
 fi
