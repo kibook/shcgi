@@ -5,14 +5,18 @@ show_help() {
 	echo "  cgi-set-cookie <name> <value>"
 	echo
 	echo "Options:"
-	echo "  <name>   Name of cookie."
-	echo "  <value>  Value of cookie."
+	echo "  <name>       Name of cookie."
+	echo "  <value>      Value of cookie."
+	echo
+	echo "Environment variables:"
+	echo "  SHCGI_COOKIE_DOMAIN  The domain used for cookies."
+	echo "  SHCGI_COOKIE_PATH    The path used for cookies."
 	echo
 	echo "Example:"
 	echo "  cgi-set-cookie sessionId 12345"
 }
 
-while getopts ahs opt
+while getopts h opt
 do
 	case $opt in
 		h|'?')
@@ -33,4 +37,16 @@ fi
 name=$1
 value=$2
 
-cgi-header -n "Set-Cookie: $name=$value"
+header="Set-Cookie: $name=$value"
+
+if test -n "$SHCGI_COOKIE_DOMAIN"
+then
+	header+="; Domain=$SHCGI_COOKIE_DOMAIN"
+fi
+
+if test -n "$SHCGI_COOKIE_PATH"
+then
+	header+="; Path=$SHCGI_COOKIE_PATH"
+fi
+
+cgi-header -n "$header"
