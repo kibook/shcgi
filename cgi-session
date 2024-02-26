@@ -78,7 +78,7 @@ find "$SHCGI_SESSION_DIR" -mindepth 1 -type d -mmin +"$SHCGI_SESSION_LIFETIME" -
 # Set the session cookie if the -s option is used
 if test "$action" = setcookie
 then
-	cgi-set-cookie "$SHCGI_SESSION_COOKIE" "$(basename "$SHCGI_SESSION")"
+	cgi-cookie "$SHCGI_SESSION_COOKIE" "$(basename "$SHCGI_SESSION")"
 # Delete the session if the -x option is used
 elif test "$action" = delete
 then
