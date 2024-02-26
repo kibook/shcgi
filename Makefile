@@ -11,7 +11,6 @@ install:
 	cp cgi-init $(PREFIX)/bin
 	cp cgi-param $(PREFIX)/bin
 	cp cgi-session $(PREFIX)/bin
-	cp cgi-set-cookie $(PREFIX)/bin
 
 uninstall:
 	rm $(PREFIX)/bin/cgi-cookie
@@ -20,4 +19,3 @@ uninstall:
 	rm $(PREFIX)/bin/cgi-init
 	rm $(PREFIX)/bin/cgi-param
 	rm $(PREFIX/bin/cgi-session
-	rm $(PREFIX)/bin/cgi-set-cookie

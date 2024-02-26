@@ -24,6 +24,8 @@ show_help() {
 	echo
 	echo 'Environment variables:'
 	echo '  SHCGI                   The current CGI request directory created by cgi-init.'
+	echo '  SHCGI_COOKIE_DOMAIN     The domain used for the session cookie.'
+	echo '  SHCGI_COOKIE_PATH       The path used for the session cookie.'
 	echo '  SHCGI_SESSION           The current session.'
 	echo '  SHCGI_SESSION_LIFETIME  The lifetime in minutes of a session. Default is 30.'
 	echo '  SHCGI_SESSION_DIR       The directory used to store sessions. Default is "cgi-sessions" in the current directory.'
@@ -76,7 +78,7 @@ find "$SHCGI_SESSION_DIR" -mindepth 1 -type d -mmin +"$SHCGI_SESSION_LIFETIME" -
 # Set the session cookie if the -s option is used
 if test "$action" = setcookie
 then
-	cgi-set-cookie "$SHCGI_SESSION_COOKIE" "$(basename "$SHCGI_SESSION")"
+	cgi-cookie "$SHCGI_SESSION_COOKIE" "$(basename "$SHCGI_SESSION")"
 # Delete the session if the -x option is used
 elif test "$action" = delete
 then
