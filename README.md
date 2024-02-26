@@ -15,8 +15,8 @@ The `PREFIX` make variable controls where the tools are installed.
 Default value is `/usr/local`.
 
 # tools
-`cgi-cookie (-a | <name>)`
-Get a cookie from the request.
+`cgi-cookie (-a | <name> [<value>])`
+Get a cookie from the request, or set a cookie in the response.
 
 `cgi-free`
 Clean up the CGI files directory.
@@ -32,9 +32,6 @@ Read parameters from the request.
 
 `cgi-session [-h | -s | -x | [<param> [<value>]]`
 Create and manage sessions.
-
-`cgi-set-cookie <name> <value>`
-Set a cookie in the response.
 
 # environment variables
 
