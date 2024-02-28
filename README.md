@@ -15,6 +15,9 @@ The `PREFIX` make variable controls where the tools are installed.
 Default value is `/usr/local`.
 
 # tools
+`. cgi`
+Shortcut to setup the CGI directory and a session.
+
 `cgi-cookie (-a | <name> [<value>])`
 Get a cookie from the request, or set a cookie in the response.
 
@@ -54,10 +57,7 @@ The name of the cookie used for the session ID. Default is `session`.
 ```sh
 #!/bin/sh
 
-export SHCGI=$(cgi-init)
-
-export SHCGI_SESSION=$(cgi-session)
-cgi-session -s
+. cgi
 
 cgi-header 'Content-type: text/html'
 
