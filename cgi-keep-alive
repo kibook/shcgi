@@ -1,7 +1,6 @@
 #!/bin/sh
 
-CGI_WAIT_INTERVAL=${CGI_WAIT_INTERVAL:-30}
-CGI_WAIT_TICK=${CGI_WAIT_TICK:-1}
+: ${SHCGI_KEEPALIVE_INTERVAL:=30}
 
 running() {
 	ps -p $1 >/dev/null 2>&1
@@ -15,17 +14,20 @@ show_help() {
 	echo "  -h  Show usage message."
 	echo "  <pid>          PID to wait on."
 	echo "  <message>      Message to send."
+	echo
+	echo "Environment variables:"
+	echo "  SHCGI_KEEPALIVE_INTERVAL  How often in seconds to send a keep-alive message. Default is ${SHCGI_KEEPALIVE_INTERVAL}."
 }
 
 format_as_header=true
 
-while getopts bhi:t: opt
+while getopts bh opt
 do
 	case $opt in
 		b)
 			format_as_header=false
 			;;
-		h|\?)
+		?)
 			show_help
 			exit
 			;;
@@ -36,21 +38,14 @@ shift $((OPTIND - 1))
 pid=$1
 message=${2:-'<!-- -->'}
 
-i=0
-
 while running "$pid"
 do
-	if test $((i % CGI_WAIT_INTERVAL)) = 0
+	if $format_as_header
 	then
-		if $format_as_header
-		then
-			cgi-header -n "CGI-Keep-Alive: $message"
-		else
-			echo "$message"
-		fi
+		cgi-header -n "CGI-Keep-Alive: $message"
+	else
+		echo "$message"
 	fi
 
-	sleep "$CGI_WAIT_TICK"
-
-	i=$((i + 1))
+	sleep "$SHCGI_KEEPALIVE_INTERVAL"
 done
