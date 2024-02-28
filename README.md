@@ -41,6 +41,12 @@ Create and manage sessions.
 `SHCGI`
 The CGI directory created by `cgi-init`.
 
+`SHCGI_COOKIE_DOMAIN`
+The domain used for cookies.
+
+`SHCGI_COOKIE_PATH`
+The path used for cookies.
+
 `SHCGI_SESSION`
 The current session directory.
 
