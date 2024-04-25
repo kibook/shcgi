@@ -21,6 +21,9 @@ Shortcut to setup the CGI directory and a session.
 `cgi-cookie (-a | <name> [<value>])`
 Get a cookie from the request, or set a cookie in the response.
 
+`cgi-file [-e] <file>`
+Send the contents of a file in the response, automatically determining the Content-Type header.
+
 `cgi-free`
 Clean up the CGI files directory.
 
