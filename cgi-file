@@ -1,0 +1,47 @@
+#!/bin/sh
+
+: ${SHCGI_MIME_TYPES:=/etc/mime.types}
+
+show_help() {
+        echo 'Usage: cgi-file [-e] <file>'
+        echo
+        echo 'Options:'
+        echo '  -e      Read file with envsubst, interpreting shell variables.'
+        echo '  <file>  The file to send in the response.'
+        echo
+        echo 'Environment variables:'
+        echo "  SHCGI_MIME_TYPES  Path to the mime types file. Default is $SHCGI_MIME_TYPES"
+}
+
+reader=cat
+
+while getopts eh opt
+do
+        case $opt in
+                e)  
+                        reader=envsubst
+                        ;;  
+                ?)  
+                        show_help
+                        exit
+                        ;;  
+        esac
+done
+shift $((OPTIND - 1))
+
+if test $# -lt 1
+then
+        echo 'Too few arguments.' >&2
+        show_help
+        exit 1
+fi
+
+mime_type() {
+        awk -v ext="${1##*.}" '{for (i = 2; i <= NF; ++i) if ($i == ext) {print $1}}' < "$SHCGI_MIME_TYPES"
+}
+
+mime_type=$(mime_type "$1")
+: ${mime_type:=application/octet-stream}
+
+cgi-header "Content-type: $mime_type"
+$reader < "$1"
