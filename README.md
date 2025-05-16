@@ -11,7 +11,7 @@ CGI utilities for POSIX shell.
 make install
 ```
 
-The `PREFIX` make variable controls where the tools are installed.
+The `prefix` make variable controls where the tools are installed.
 Default value is `/usr/local`.
 
 # tools
