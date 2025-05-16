@@ -72,7 +72,7 @@ cgi-free
 ## templates
 This example demonstrates a method for creating template pages with variables that are filled in by the script.
 
-### template.html
+### `template.html`
 ```html
 <!DOCTYPE html>
 <html>
@@ -85,7 +85,7 @@ This example demonstrates a method for creating template pages with variables th
 </html>
 ```
 
-### example.cgi
+### `example.cgi`
 ```sh
 #!/bin/sh
 
