@@ -24,7 +24,7 @@ Default value is `/usr/local`.
 | `cgi-free`                                    | Clean up the CGI files directory.                                                                |
 | `cgi-header [-n] <header>`                    | Build the HTTP headers for the response.                                                         |
 | `cgi-init`                                    | Initiate the CGI files directory. Should be cleaned up at the end of the script with `cgi-free`. |
-| `cgi-keep-alive [-b] <pid> [<message>]`       | Keep the CGI script alive with messages while a process is running.                              |
+| `cgi-keep-alive [-b] <pid> [<message>]`       | Keep the CGI script alive while a process is running.                                            |
 | `cgi-param (-a \| <name>)`                    | Read parameters from the request.                                                                |
 | `cgi-session [-s \| -x \| <param> [<value>]]` | Create and manage sessions.                                                                      |
 
@@ -42,7 +42,10 @@ Default value is `/usr/local`.
 | `SHCGI_SESSION_DIR`        | The directory used to store sessions. Default is `cgi-sessions` in the current directory.   |
 | `SHCGI_SESSION_COOKIE`     | The name of the cookie used for the session ID. Default is `session`.                       |
 
-# example
+# examples
+
+## the basics
+A very simple example of the shcgi tools in action.
 ```sh
 #!/bin/sh
 
@@ -58,6 +61,68 @@ cat <<EOF
 <body>
 <p>Value of parameter foo: $(cgi-param foo)</p>
 <p>Value of session parameter bar: $(cgi-session bar)</p>
+<p>Value of cookie session: $(cgi-cookie session)</p>
+</body>
+</html>
+EOF
+
+cgi-free
+```
+
+## templates
+This example demonstrates a method for creating template pages with variables that are filled in by the script.
+
+### template.html
+```html
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Template example</title>
+    </head>
+    <body>
+        <p>The current date is: $current_date</p>
+    </body>
+</html>
+```
+
+### example.cgi
+```sh
+#!/bin/sh
+
+. cgi
+
+export current_date=$(date -I)
+
+cgi-file -e template.html
+
+cgi-free
+```
+
+## cgi-keep-alive
+This example uses `cgi-keep-alive` to keep the CGI script alive while a very long process runs in the background.
+```sh
+#!/bin/sh
+
+long_running_process() {
+    sleep 120
+}
+
+. cgi
+
+long_running_process &
+
+# cgi-keep-alive will output dummy headers to keep the CGI script alive until long_running_process completes
+cgi-keep-alive $!
+
+cgi-header 'Content-type: text/html'
+
+cat <<EOF
+<html>
+<head>
+<title>CGI example</title>
+</head>
+<body>
+<p>Sorry for the wait!</p>
 </body>
 </html>
 EOF
