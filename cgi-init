@@ -10,7 +10,7 @@ show_help() {
 	echo "  cgi=\$(cgi-init)"
 	echo
 	echo "Directory structure:"
-	echo "  \${cgi}/message-body  Raw request message body"
+	echo "  \${cgi}/request-body  Raw request message body"
 	echo "  \${cgi}/params        GET/POST parameters"
 	echo "  \${cgi}/cookies       HTTP cookies"
 }
@@ -36,7 +36,7 @@ else
 fi
 
 # Store request message body
-cat > "${dir}/message-body"
+cat > "${dir}/request-body"
 
 # Read GET/POST parameters
 mkdir -p "${dir}/params"
@@ -61,11 +61,11 @@ read_params() {
 # Extract MIME-encoded POST request
 if echo "$CONTENT_TYPE" | grep -q 'multipart/form-data'
 then
-	cat_with_header < "${dir}/message-body" | ripmime -i - --formdata -q -d "${dir}/params" >/dev/null
+	cat_with_header < "${dir}/request-body" | ripmime -i - --formdata -q -d "${dir}/params" >/dev/null
 # Read params from url-encoded POST request
 elif echo "$CONTENT_TYPE" | grep -q 'application/x-www-form-urlencoded'
 then
-	read_params < "${dir}/message-body"
+	read_params < "${dir}/request-body"
 fi
 
 # Read params from url-encoded query string
