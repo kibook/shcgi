@@ -13,14 +13,15 @@
 action=
 
 show_help() {
-	echo 'Usage: cgi-session [-h | -s | -x | [<param> [<value>]]'
+	echo 'Usage: cgi-session [-h | -s | -x | [<param> [<value>]] | -d <param>]'
 	echo
 	echo 'Options:'
-	echo '  -h         Show the usage message.'
-	echo '  -s         Sets the session cookie header for the current response.'
-	echo '  -x         Deletes the current session.'
-	echo '  <param>    The name of a session parameter.'
-	echo '  <value>    The new value to set for the session parameter.'
+	echo '  -d <param>  Delete a session parameter.'
+	echo '  -h          Show the usage message.'
+	echo '  -s          Sets the session cookie header for the current response.'
+	echo '  -x          Deletes the current session.'
+	echo '  <param>     The name of a session parameter.'
+	echo '  <value>     The new value to set for the session parameter.'
 	echo
 	echo 'Environment variables:'
 	echo '  SHCGI                   The current CGI request directory created by cgi-init.'
@@ -43,13 +44,19 @@ show_help() {
 	echo '  cgi-session foo bar'
 	echo '  foo=$(cgi-session foo)'
 	echo
+	echo '  # Delete a session parameter'
+	echo '  cgi-session -d foo'
+	echo
 	echo '  # Delete the session'
 	echo '  cgi-session -x'
 }
 
-while getopts hsx opt
+while getopts dhsx opt
 do
 	case $opt in
+		d)
+			action=unset
+			;;
 		h)
 			show_help
 			exit
@@ -83,6 +90,13 @@ then
 elif test "$action" = delete
 then
 	rm -rf "$SHCGI_SESSION"
+# cgi-session -d <param>
+elif test "$action" = unset
+then
+	if test $# = 1 -a -e "$SHCGI_SESSION/$1"
+	then
+		rm -f "$SHCGI_SESSION/$1"
+	fi
 # cgi-session
 elif test $# = 0
 then
