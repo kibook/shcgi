@@ -7,6 +7,7 @@ all:
 install:
 	cp -t $(prefix)/bin cgi
 	cp -t $(prefix)/bin cgi-cookie
+	cp -t $(prefix)/bin cgi-file
 	cp -t $(prefix)/bin cgi-free
 	cp -t $(prefix)/bin cgi-header
 	cp -t $(prefix)/bin cgi-init
@@ -17,6 +18,7 @@ install:
 uninstall:
 	rm $(prefix)/bin/cgi
 	rm $(prefix)/bin/cgi-cookie
+	rm $(prefix)/bin/cgi-file
 	rm $(prefix)/bin/cgi-free
 	rm $(prefix)/bin/cgi-header
 	rm $(prefix)/bin/cgi-init
